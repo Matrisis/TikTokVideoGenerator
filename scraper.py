@@ -3,12 +3,15 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from utils import config
+from translator import translate_text, translate_text_deepl
 
-def scrape(post_url):
+def scrape(post_url, lang = "en", limit_comments=5):
+    print("Scrapping...")
     bot = utils.create_bot(headless=True)
     data = {}
     
     try:
+        print("Connecting to Reddit...")
         # Load cookies to prevent cookie overlay & other issues
         bot.get('https://www.reddit.com')
         for cookie in config['reddit_cookies'].split('; '):
@@ -17,22 +20,62 @@ def scrape(post_url):
         bot.get(post_url)
 
         # Fetching the post itself, text & screenshot
+        print("Accessing post...")
         post = WebDriverWait(bot, 20).until(EC.presence_of_element_located((By.CSS_SELECTOR, '.Post')))
-        post_text = post.find_element(By.CSS_SELECTOR, 'h1').text
-        data['post'] = post_text
+        post_text = post.find_element(By.CSS_SELECTOR, 'h1')
+        translated_text = translate_text_deepl(post_text.text, lang)
+        bot.execute_script("arguments[0].innerHTML = arguments[1];", post_text, translated_text.capitalize())
+        data['post'] = translated_text
+
+
+        # Translate original post content
+        print("Translating post...")
+        content_paragraphs = bot.find_elements(By.CSS_SELECTOR, '.Post .RichTextJSON-root p')
+        if content_paragraphs:
+            content_translated = []
+            for paragraph in content_paragraphs:
+                original_text = paragraph.text
+                translated_text = translate_text_deepl(original_text, lang)  # Assuming translate_text function is already defined
+                bot.execute_script("arguments[0].innerHTML = arguments[1];", paragraph, translated_text.capitalize())
+                content_translated.append(translated_text)
+            data['post_content'] = "\n".join(content_translated)
+
+
+        # Create call to action
+        cta = "Please don't forget to subscribe !"
+        data['cta'] = cta if lang == "en" else translate_text_deepl(cta, lang)
+
+        # Removing reddit interest popup
+        print("Removing reddit interest popup...")
+        time.sleep(3)
+        interest_popup_close_button = bot.find_element(By.XPATH, '//*[@id="SHORTCUT_FOCUSABLE_DIV"]/div[4]/div/div/div/header/div/div[2]/button')
+        if interest_popup_close_button:
+            interest_popup_close_button.click()
+            time.sleep(1)
+
+        # Screenshot post
         post.screenshot('output/post.png')
 
+        # Screenshot post for CTA
+        post.screenshot('output/cta.png')
+
+        # Screenshot post content if exists
+        if content_paragraphs:
+            post.screenshot('output/post_content.png')
+
         # Let comments load
+        print("Loading comments...")
         bot.execute_script("window.scrollTo(0, document.body.scrollHeight);")
         time.sleep(3)
 
         # Fetching comments & top level comment determinator
+        print("Fetching top comments...")
         comments = bot.find_elements(By.CSS_SELECTOR, 'div[id^=t1_][tabindex]')
         allowed_style = comments[0].get_attribute("style")
-        
+
+        print("Filtering comments...")
         # Filter for top only comments
-        NUMBER_OF_COMMENTS = 5
-        comments = [comment for comment in comments if comment.get_attribute("style") == allowed_style][:NUMBER_OF_COMMENTS]
+        comments = [comment for comment in comments if comment.get_attribute("style") == allowed_style][:limit_comments]
 
         print('💬 Scraping comments...',end="",flush=True)
         # Save time & resources by only fetching X content
@@ -47,7 +90,6 @@ def scrape(post_url):
                     pass
 
                 # Scrolling to the comment ensures that the profile picture loads
-                # Credits: https://stackoverflow.com/a/57630350
                 desired_y = (comments[i].size['height'] / 2) + comments[i].location['y']
                 window_h = bot.execute_script('return window.innerHeight')
                 window_y = bot.execute_script('return window.pageYOffset')
@@ -58,16 +100,23 @@ def scrape(post_url):
                 time.sleep(0.2)
 
                 # Getting comment into string
-                text = "\n".join([element.text for element in comments[i].find_elements(By.CSS_SELECTOR, '.RichTextJSON-root')])
+                elements = comments[i].find_elements(By.CSS_SELECTOR, '.RichTextJSON-root')
+                translated_elements = []
+                for element in elements:
+                    translated_text = translate_text_deepl( element.text, lang)
+                    bot.execute_script("arguments[0].innerHTML = arguments[1];", element, translated_text.capitalize())
+                    translated_elements.append(translated_text)
+                text = "\n".join(translated_elements)
 
-                # Screenshot & save text
-                comments[i].screenshot(f'output/{i}.png')
-                data[str(i)] = ''.join(filter(lambda c: c in string.printable, text))
+                if "I am a bot" not in text and text:
+                    # Screenshot & save text
+                    image_path = f'output/{i}.png'
+                    comments[i].screenshot(image_path)
+                    data[str(i)] = text
             except Exception as e:
                 if config['debug']:
                     raise e
                 pass
-
         if bot.session_id:
             bot.quit()
         return data
