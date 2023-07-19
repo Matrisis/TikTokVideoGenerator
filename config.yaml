@@ -1,9 +1,0 @@
-debug: true
-deepl_api_key:
-tiktok_cookies:
-reddit_cookies:
-lang: fr-FR
-sub: AskReddit
-limit_posts: 3
-limit_comments : 7
-render_threads: 10
