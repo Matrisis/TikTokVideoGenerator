@@ -5,5 +5,5 @@ geckodriver.log
 render/
 output/
 backgrounds/
-.idea
+.idea/
 config.yaml
