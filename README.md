@@ -2,7 +2,7 @@
 Automatic content bot using Selenium to scrape Reddit and render videos with MoviePY.
 
 # Requirements
-You need to have the latest version of google chrome installed on your PC
+You need to have the latest version of google chrome installed on your PC.
 
 # Usage
 Requires some manual setup, 
@@ -19,6 +19,3 @@ Requires some manual setup,
 6. Run the code using `python  __main__.py`
 7. You can run `python  __main__.py {subreddit} {posts_numbers} {comments_numbers}` to specify data directly.
 4. Enjoy!
-
-# Unable to properly upload or want more advanced uploading features like audios?
-Check out my [tiktok-uploader](https://github.com/edde746/tiktok-uploader).

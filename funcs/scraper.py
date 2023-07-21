@@ -1,9 +1,8 @@
-import time,utils,string
+import time
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from utils import config
-from translator import translate_text, translate_text_deepl
+from . import utils, translator
 
 def scrape(post_url, lang = "en", limit_comments=5):
     print("Scrapping...")
@@ -14,7 +13,7 @@ def scrape(post_url, lang = "en", limit_comments=5):
         print("Connecting to Reddit...")
         # Load cookies to prevent cookie overlay & other issues
         bot.get('https://www.reddit.com')
-        for cookie in config['reddit_cookies'].split('; '):
+        for cookie in utils.config['reddit_cookies'].split('; '):
             cookie_data = cookie.split('=')
             bot.add_cookie({'name':cookie_data[0],'value':cookie_data[1],'domain':'reddit.com'})
         bot.get(post_url)
@@ -23,7 +22,7 @@ def scrape(post_url, lang = "en", limit_comments=5):
         print("Accessing post...")
         post = WebDriverWait(bot, 20).until(EC.presence_of_element_located((By.CSS_SELECTOR, '.Post')))
         post_text = post.find_element(By.CSS_SELECTOR, 'h1')
-        translated_text = translate_text_deepl(post_text.text, lang)
+        translated_text = translator.translate_text_deepl(post_text.text, lang)
         bot.execute_script("arguments[0].innerHTML = arguments[1];", post_text, translated_text.capitalize())
         data['post'] = translated_text
 
@@ -35,7 +34,7 @@ def scrape(post_url, lang = "en", limit_comments=5):
             content_translated = []
             for paragraph in content_paragraphs:
                 original_text = paragraph.text
-                translated_text = translate_text_deepl(original_text, lang)  # Assuming translate_text function is already defined
+                translated_text = translator.translate_text_deepl(original_text, lang)  # Assuming translate_text function is already defined
                 bot.execute_script("arguments[0].innerHTML = arguments[1];", paragraph, translated_text.capitalize())
                 content_translated.append(translated_text)
             data['post_content'] = "\n".join(content_translated)
@@ -43,15 +42,18 @@ def scrape(post_url, lang = "en", limit_comments=5):
 
         # Create call to action
         cta = "Please don't forget to subscribe !"
-        data['cta'] = cta if lang == "en" else translate_text_deepl(cta, lang)
+        data['cta'] = cta if lang == "en" else translator.translate_text_deepl(cta, lang)
 
         # Removing reddit interest popup
         print("Removing reddit interest popup...")
-        time.sleep(3)
-        interest_popup_close_button = bot.find_element(By.XPATH, '//*[@id="SHORTCUT_FOCUSABLE_DIV"]/div[4]/div/div/div/header/div/div[2]/button')
-        if interest_popup_close_button:
-            interest_popup_close_button.click()
-            time.sleep(1)
+        try :
+            time.sleep(3)
+            interest_popup_close_button = bot.find_element(By.XPATH, '//*[@id="SHORTCUT_FOCUSABLE_DIV"]/div[4]/div/div/div/header/div/div[2]/button')
+            if interest_popup_close_button:
+                interest_popup_close_button.click()
+                time.sleep(1)
+        except:
+            print("Interest popup removal error !")
 
         # Screenshot post
         post.screenshot('output/post.png')
@@ -103,7 +105,7 @@ def scrape(post_url, lang = "en", limit_comments=5):
                 elements = comments[i].find_elements(By.CSS_SELECTOR, '.RichTextJSON-root')
                 translated_elements = []
                 for element in elements:
-                    translated_text = translate_text_deepl( element.text, lang)
+                    translated_text = translator.translate_text_deepl( element.text, lang)
                     bot.execute_script("arguments[0].innerHTML = arguments[1];", element, translated_text.capitalize())
                     translated_elements.append(translated_text)
                 text = "\n".join(translated_elements)
@@ -114,7 +116,7 @@ def scrape(post_url, lang = "en", limit_comments=5):
                     comments[i].screenshot(image_path)
                     data[str(i)] = text
             except Exception as e:
-                if config['debug']:
+                if utils.config['debug']:
                     raise e
                 pass
         if bot.session_id:
@@ -123,6 +125,6 @@ def scrape(post_url, lang = "en", limit_comments=5):
     except Exception as e:
         if bot.session_id:
             bot.quit()
-        if config['debug']:
+        if utils.config['debug']:
             raise e
         return False

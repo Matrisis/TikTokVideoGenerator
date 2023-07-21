@@ -9,3 +9,6 @@ numpy
 Pillow
 pytesseract
 deep-translator
+replicate
+elevenlabs
+num2words
