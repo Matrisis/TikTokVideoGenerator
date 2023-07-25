@@ -22,25 +22,23 @@ async def generate(text, name, voice, concat=True):
 
 
 
-def req_el(sentence, lang, path):
+def req_el(sentence, lang, path, rep=0):
     '''
     Try to create infinite free eleven labs requests.
     Use api key with a premium account to get faster result
     '''
-    try:
-        audio = el_generate(
-            text=sentence,
-            voice="Josh",
-            model='eleven_monolingual_v1' if lang == "en" else 'eleven_multilingual_v1',
-        )
-        save(audio, path)
-    except:
-        req_el(sentence, lang, path)
+    audio = el_generate(
+        text=sentence,
+        voice="Josh",
+        model='eleven_monolingual_v1' if lang == "en" else 'eleven_multilingual_v1',
+    )
+    save(audio, path)
+
 
 
 def generate_el(text, name, lang, concat=True):
     # Uncomment the line below to use eleven labs pro with api key
-    # set_api_key(utils.config['eleven_labs_api_key'])
+    set_api_key(utils.config['eleven_labs_api_key'])
     path = f"output/{name}.mp3"
     req_el(text, lang, path)
     return path

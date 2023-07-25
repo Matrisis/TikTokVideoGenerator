@@ -9,6 +9,7 @@ async def reddit(args):
     sub = args.subreddit if args.subreddit else utils.config['sub'] if utils.config['sub'] else "AskReddit"
     limit_posts = args.lp if args.lp else utils.config['limit_posts'] if utils.config['limit_posts'] else 5
     limit_comments = int(args.lc if args.lc else utils.config['limit_comments'] if utils.config['limit_comments'] else 5)
+    elevenlabs = args.elevenlabs
 
     # Fetching posts from r/AskReddit
     headers = { 'user-agent':'py-reddit-scraping:0:1.0 (by u/ur_name)' }
@@ -48,10 +49,14 @@ async def reddit(args):
 
             # Generate TTS clips for each comment
             print("\n📢 Generating voice clips...", end="", flush=True)
-            voice = await tts.get_voice(lang)
             for key in data.keys():
-                print('.',end="",flush=True)
-                await tts.generate(text=data[key], name=key, voice=voice)
+                if elevenlabs:
+                    tts.generate_el(text=data[key], name=key, lang=lang)
+                else:
+                    voice = await tts.get_voice(lang)
+                    print('.', end="", flush=True)
+                    await tts.generate(text=data[key], name=key, voice=voice)
+
 
             # Render & Upload
             print("\n🎥 Rendering video...")
