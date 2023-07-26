@@ -2,7 +2,7 @@ import yaml
 import undetected_chromedriver as uc
 
 # Load and validate config
-config = yaml.safe_load(open('config.yaml').read())
+config = yaml.safe_load(open('app/config.yaml').read())
 
 if not config['tiktok_cookies']:
     raise Exception('Missing TikTok Cookies')

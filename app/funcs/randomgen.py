@@ -1,6 +1,6 @@
 from num2words import num2words
 
-from funcs import utils, script, translator, video_maker, tts
+from app.funcs import script, utils, tts, translator, video_maker
 
 
 async def randomgen(args):
@@ -10,9 +10,9 @@ async def randomgen(args):
     facts_number = args.facts if args.facts else 7
     option = args.option
 
-    print("Generating random facts...")
-    facts = script.get_random_phrases("scripts/script.json", facts_number)
-    ctas =  script.get_random_phrases("scripts/cta.json", round(facts_number / 2))
+    print("Generating random facts..."  )
+    facts = script.get_random_phrases("app/scripts/script.json", facts_number)
+    ctas =  script.get_random_phrases("app/scripts/cta.json", round(facts_number / 2))
     final_facts = script.integrate_phrases(facts, ctas)
     text = (" ").join(["Random facts."] + final_facts + ["Don't forget to subscribe to learn more."])
 

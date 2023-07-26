@@ -3,8 +3,6 @@ import uuid
 from moviepy.editor import *
 import random, os
 
-from moviepy.video.fx.crop import crop
-
 from . import utils
 
 resolution = (1080, 1920)

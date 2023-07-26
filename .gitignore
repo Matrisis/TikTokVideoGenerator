@@ -2,8 +2,8 @@ __pycache__/
 geckodriver.log
 *.cookies
 *TEMP*.mp3
-render/
-output/
-backgrounds/
+app/render/
+app/output/
+app/backgrounds/
 .idea/
-config.yaml
+app/config.yaml

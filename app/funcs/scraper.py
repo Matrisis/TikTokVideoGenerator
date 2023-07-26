@@ -105,7 +105,7 @@ def scrape(post_url, lang = "en", limit_comments=5):
                 elements = comments[i].find_elements(By.CSS_SELECTOR, '.RichTextJSON-root')
                 translated_elements = []
                 for element in elements:
-                    translated_text = translator.translate_text_deepl( element.text, lang)
+                    translated_text = translator.translate_text_deepl(element.text, lang)
                     bot.execute_script("arguments[0].innerHTML = arguments[1];", element, translated_text.capitalize())
                     translated_elements.append(translated_text)
                 text = "\n".join(translated_elements)

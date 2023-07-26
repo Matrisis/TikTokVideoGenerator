@@ -1,5 +1,4 @@
-from funcs import whisper, utils, translator, tts, video_maker
-import re
+from app.funcs import whisper, utils, tts, translator, video_maker
 from num2words import num2words
 
 

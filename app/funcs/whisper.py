@@ -1,7 +1,7 @@
 from moviepy.editor import VideoFileClip
 import replicate
 import os
-from funcs import utils
+from app.funcs import utils
 
 
 def video_to_text(path, initial_prompt, lang="en"):

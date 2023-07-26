@@ -1,13 +1,8 @@
-import os
 import random
 import edge_tts
-from moviepy.audio.AudioClip import concatenate_audioclips
-from moviepy.audio.io.AudioFileClip import AudioFileClip
 
 from . import utils
-from edge_tts import VoicesManager
 from elevenlabs import set_api_key, generate as el_generate, save
-import requests
 
 
 async def get_voice(lang = "en-US"):
