@@ -6,7 +6,13 @@ This project uses Docker to run a Python application that generates TikTok video
 
 You need Docker installed on your machine. Follow the installation guide for your platform [here](https://docs.docker.com/get-docker/).
 
-You need Chrome installed on you machine. 
+You need Chrome installed on you machine.
+
+## Project Setup
+
+**Copy config and fill it:**
+`cp app/config.yaml.example app/config.yaml`
+
 
 ## Docker Setup and Usage
 
@@ -25,6 +31,7 @@ You can customize the operation of the Python application using command-line arg
 ```shell
 docker-compose run your-python-app python ./app/__main__.py -f reddit -l fr-FR
 ```
+
 
 ## Command-Line Arguments
 
@@ -49,6 +56,26 @@ Please refer to the Python script documentation or use the `-h` flag for further
 
 ```shell
 docker-compose run your-python-app python ./app/__main__.py -h
+```
+
+## Usage
+
+1. **Basic usage :**
+```shell
+docker-compose run tiktok-maker python app/__main__.py -f {function} -l {lang to translate to}
+```
+
+### Usage Examples
+```shell
+docker-compose run tiktok-maker python app/__main__.py -f randomgen -l fr-FR  --elevenlabs True 
+```
+```shell
+docker-compose run tiktok-maker python app/__main__.py -f reddit -l fr-FR --subreddit AskReddit --lp 5 --lc 8 --elevenlabs True
+```
+
+## Recovering files
+```shell
+
 ```
 
 ## Note
