@@ -15,7 +15,7 @@ if __name__ == '__main__':
     parser.add_argument("--subreddit", type=str, default="AskReddit", help="if used with reddit function : Subreddit. (default : AskReddit)")
     parser.add_argument("--lp", type=int, default=5, help="if used with reddit function : Posts limit. (default : 5)")
     parser.add_argument("--lc", type=int, default=5, help="if used with reddit function : Comments limit. (default : 5)")
-    parser.add_argument("--file", type=str, default="output/")
+    parser.add_argument("--file", type=str, default="app/output/")
     parser.add_argument("--elevenlabs", type=bool, default=False)
     parser.add_argument("--option", default=None)
     parser.add_argument("--facts", type=int, default=7)

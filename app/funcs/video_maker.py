@@ -7,7 +7,7 @@ from . import utils
 
 resolution = (1080, 1920)
 
-def render_remaker(audio_files, video_dir="backgrounds/", lang="en-EN", dir="remaker"):
+def render_remaker(audio_files, video_dir="app/backgrounds/", lang="en-EN", dir="remaker"):
     video_files = [os.path.join(video_dir, file) for file in os.listdir(video_dir) if file.endswith('.mp4')]
     video_clips = []
     prev_video_files = []
@@ -59,7 +59,7 @@ def render_remaker(audio_files, video_dir="backgrounds/", lang="en-EN", dir="rem
 
     # Write the result to a file
     final_video.write_videofile(
-        f'render/{dir}/{lang}/{uuid.uuid4()}.mp4',
+        f'app/render/{dir}/{lang}/{uuid.uuid4()}.mp4',
         threads=utils.config['render_threads'],
         audio_codec="aac",
         fps=60)
@@ -78,15 +78,15 @@ def render(name, lang, limit_comments, post_content):
     if post_content:
         flow.append('post_content')
     for i in range(limit_comments):
-        if os.path.exists(f'output/{i}.mp3'):
+        if os.path.exists(f'app/output/{i}.mp3'):
             flow.append(str(i))
 
     # Load all the clips
     clips = []
     duration = 0
     for part in flow:
-        audio = AudioFileClip(f"output/{part}.mp3")
-        clip = ImageClip(f"output/{part}.png").set_duration(audio.duration).fx(vfx.resize,
+        audio = AudioFileClip(f"app/output/{part}.mp3")
+        clip = ImageClip(f"app/output/{part}.png").set_duration(audio.duration).fx(vfx.resize,
                                                                                width=resolution[0] * 0.9).set_position(
             ("center", "center"))
         clip = clip.set_audio(audio)
@@ -98,7 +98,7 @@ def render(name, lang, limit_comments, post_content):
     image_clips = concatenate_videoclips(clips).set_position(("center", "center"))
 
     # Loading background
-    background_clip = "backgrounds/" + random.choice(os.listdir("backgrounds"))
+    background_clip = "app/backgrounds/" + random.choice(os.listdir("backgrounds"))
     background = VideoFileClip(background_clip, audio=False).fx(vfx.resize, height=resolution[1]).fx(vfx.loop,
                                                                                                      duration=image_clips.duration).set_position(
         ("center", "center"))
@@ -107,7 +107,7 @@ def render(name, lang, limit_comments, post_content):
     composite = CompositeVideoClip([background, image_clips], resolution)
     # Render
     composite.write_videofile(
-        f'render/reddit/{lang}/{name}.mp4',
+        f'app/render/reddit/{lang}/{name}.mp4',
           audio_codec="aac",
           threads=utils.config['render_threads'],
           fps=60)

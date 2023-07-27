@@ -6,7 +6,7 @@ from app.funcs import utils
 
 def video_to_text(path, initial_prompt, lang="en"):
     video = VideoFileClip(path)
-    transcribe_path = "output/transcribing.mp3"
+    transcribe_path = "app/output/transcribing.mp3"
     video.audio.write_audiofile(transcribe_path)
     os.environ["REPLICATE_API_TOKEN"] = utils.config['replicate_api_key']
     print("Reading text...")

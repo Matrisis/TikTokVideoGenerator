@@ -36,8 +36,8 @@ async def reddit(args):
                 continue
 
             # Clean 'temporary' files from last video
-            for file in os.listdir('output'):
-                os.remove(f'output/{file}')
+            for file in os.listdir('app/output'):
+                os.remove(f'app/output/{file}')
 
             # Scraping the post, screenshotting, etc
             print("Url : " + url)

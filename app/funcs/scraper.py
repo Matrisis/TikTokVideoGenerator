@@ -56,14 +56,14 @@ def scrape(post_url, lang = "en", limit_comments=5):
             print("Interest popup removal error !")
 
         # Screenshot post
-        post.screenshot('output/post.png')
+        post.screenshot('app/output/post.png')
 
         # Screenshot post for CTA
-        post.screenshot('output/cta.png')
+        post.screenshot('app/output/cta.png')
 
         # Screenshot post content if exists
         if content_paragraphs:
-            post.screenshot('output/post_content.png')
+            post.screenshot('app/output/post_content.png')
 
         # Let comments load
         print("Loading comments...")
@@ -112,7 +112,7 @@ def scrape(post_url, lang = "en", limit_comments=5):
 
                 if "I am a bot" not in text and text:
                     # Screenshot & save text
-                    image_path = f'output/{i}.png'
+                    image_path = f'app/output/{i}.png'
                     comments[i].screenshot(image_path)
                     data[str(i)] = text
             except Exception as e:
